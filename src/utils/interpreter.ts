@@ -45,7 +45,7 @@ export async function execute(
                 codePoint++;
                 break;
             case ',':
-                memory[point] += await input();
+                memory[point] = await input();
                 codePoint++;
                 break;
             case '[':
