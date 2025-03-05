@@ -1,0 +1,16 @@
+.editor{
+    font-size: 32px;
+    height: 100%;
+}
+
+.editor>div {
+    height: 100%;
+}
+
+.editor>div>div {
+    height: 100%;
+}
+
+.editor .cm-focused {
+    outline: none;
+}
