@@ -1,80 +1,107 @@
-export async function execute(
-    code: string,
-    memory: number[],
-    input: () => Promise<number>
-): Promise<string> {
-    let outputData: string = "";
+export class Interpreter {
+    isFinished: boolean = false;
+    memory: number[] = [0];
+    output: string = "";
 
-    const stack: number[] = [];
-    const codeSplit = code.split('');
-    let isFinal = false;
-    let codePoint: number = 0;
-    let point: number = 0;
+    private code: string;
+    private stack: number[] = [];
 
-    while (!isFinal) {
-        switch (codeSplit[codePoint]) {
-            case '+':
-                if (memory[point] === 255) {
-                    memory[point] = 0;
-                } else {
-                    memory[point]++;
-                }
-                codePoint++;
-                break;
-            case '-':
-                if (memory[point] === 0) {
-                    memory[point] = 255;
-                } else {
-                    memory[point]--;
-                }
-                codePoint++;
-                break;
-            case '>':
-                point++;
-                if (memory[point] === undefined) {
-                    memory.push(0);
-                }
-                codePoint++;
-                break;
-            case '<':
-                if (point > 0) point--;
-                codePoint++;
-                break;
-            case '.':
-                outputData += String.fromCharCode(memory[point]);
-                codePoint++;
-                break;
-            case ',':
-                memory[point] = await input();
-                codePoint++;
-                break;
-            case '[':
-                if (memory[point] === 0) {
-                    let depth = 1;
-                    while (depth > 0) {
-                        codePoint++;
-                        if (codeSplit[codePoint] === '[') depth++;
-                        if (codeSplit[codePoint] === ']') depth--;
-                    }
-                } else {
-                    stack.push(codePoint);
-                }
-                codePoint++;
-                break;
-            case ']':
-                if (memory[point] !== 0) {
-                    codePoint = stack[stack.length - 1];
-                } else {
-                    stack.pop();
-                    codePoint++;
-                }
-                break;
-            default:
-                break;
-        }
-        
-        if (codePoint >= codeSplit.length) { isFinal = true; }
+    private pointerPosition: number = 0;
+    private codePointerPosition: number = 0;
+
+    private input: () => Promise<number>;
+
+    constructor(code: string, input: () => Promise<number>) {
+        this.code = code;
+        this.input = input;
     }
 
-    return outputData;
+    async makeStep() {
+        if (this.isFinished) return;
+
+        if (this.codePointerPosition >= this.code.length) {
+            this.isFinished = true;
+            return;
+        }
+
+        switch (this.code[this.codePointerPosition]) {
+            case '+':
+                this.memory[this.pointerPosition] =
+                    this.memory[this.pointerPosition] === 255
+                        ? 0
+                        : this.memory[this.pointerPosition] + 1
+                this.codePointerPosition++;
+
+                break;
+            case '-':
+                this.memory[this.pointerPosition] =
+                    this.memory[this.pointerPosition] === 0
+                        ? 255
+                        : this.memory[this.pointerPosition] - 1
+                this.codePointerPosition++;
+
+                break;
+            case '>':
+                this.pointerPosition++;
+
+                this.memory[this.pointerPosition] = this.memory[this.pointerPosition] || 0;
+
+                this.codePointerPosition++;
+
+                break;
+            case '<':
+                if (this.pointerPosition > 0) this.pointerPosition--;
+
+                this.codePointerPosition++;
+
+                break;
+            case '.':
+                this.output += String.fromCharCode(this.memory[this.pointerPosition]);
+
+                this.codePointerPosition++;
+
+                break;
+            case ',':
+                this.memory[this.pointerPosition] = await this.input();
+
+                this.codePointerPosition++;
+
+                break;
+            case '[':
+                if (this.memory[this.pointerPosition] === 0) {
+                    let bracketsCount: number = 1;
+
+                    while (bracketsCount > 0) {
+                        this.codePointerPosition++;
+
+                        if (this.codePointerPosition >= this.code.length) {
+                            this.isFinished = true;
+                            this.output = `There is no loop ending.`;
+                            return;
+                        }
+
+                        if (this.code[this.codePointerPosition] === "[") bracketsCount++;
+                        else if (this.code[this.codePointerPosition] === "]") bracketsCount--;
+                    }
+                } else {
+                    this.stack.push(this.codePointerPosition);
+                }
+
+                this.codePointerPosition++;
+
+                break;
+            case ']':
+                if (this.memory[this.pointerPosition] !== 0) {
+                    this.codePointerPosition = this.stack[this.stack.length - 1];
+                } else {
+                    this.stack.pop();
+                    this.codePointerPosition++;
+                }
+                
+                break;
+            default:
+                this.isFinished = true;
+                this.output = `Error at index ${this.codePointerPosition} - ${this.code[this.codePointerPosition]}`;
+        }
+    }
 }

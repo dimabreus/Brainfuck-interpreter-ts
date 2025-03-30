@@ -8,17 +8,19 @@ import "./Editor.css";
 interface EditorProps {
   value: string;
   onChange: (value: string) => void;
+  editable?: boolean
 }
 
-const Editor: React.FC<EditorProps> = ({ value, onChange }) => {
+const Editor: React.FC<EditorProps> = ({ value, onChange, editable = true }) => {
   return (
-    <div className="editor">
+    <div className="editor content">
       <CodeMirror
         value={value}
         height="200px"
         theme={darcula}
         extensions={[StreamLanguage.define(brainfuck)]}
         onChange={onChange}
+        editable={editable}
       />
     </div>
   );

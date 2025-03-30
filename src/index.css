@@ -7,8 +7,9 @@ body {
 
   font-family: "Rubik", sans-serif;
   font-style: normal;
+  font-size: 24px;
 
-  overflow: hidden;
+  overflow-y: hidden;
 }
 
 body, * {

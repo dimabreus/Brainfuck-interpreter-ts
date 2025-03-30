@@ -14,3 +14,7 @@
 .editor .cm-focused {
     outline: none;
 }
+
+.editor .cm-editor {
+    background-color: transparent;
+}
