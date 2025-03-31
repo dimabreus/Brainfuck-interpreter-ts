@@ -1,4 +1,4 @@
-.editor{
+.editor {
     font-size: 32px;
     height: 100%;
 }
@@ -17,4 +17,9 @@
 
 .editor .cm-editor {
     background-color: transparent;
+}
+
+.editor .cm-content {
+    overflow-x: auto;
+    flex-shrink: 1;
 }

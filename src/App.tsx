@@ -36,10 +36,10 @@ function App() {
       while (i < 100 && interpreter && !interpreter?.isFinished) {
         interpreter.makeStep();
 
-        setOutput(interpreter.output || "...");
-
         i++;
       }
+
+      setOutput(interpreter?.output || "...");
     });
 
     return () => clearInterval(intervalId);
