@@ -99,9 +99,6 @@ export class Interpreter {
                 }
                 
                 break;
-            default:
-                this.isFinished = true;
-                this.output = `Error at index ${this.codePointerPosition} - ${this.code[this.codePointerPosition]}`;
         }
     }
 }
